@@ -17,6 +17,3 @@ Thumbs.db
 build/
 dist/
 
-output/*.csv
-output/*.txt
-!output/.gitkeep
