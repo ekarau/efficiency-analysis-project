@@ -1,0 +1,7 @@
+firm_id,Y_observed,Y_optimal,deviation_D,KPI,status
+1,1.0,1.0,0.0,1.0,efficient
+2,4.0,4.0,0.0,1.0,efficient
+3,7.0,9.0,0.25131443,0.7777777777777778,inefficient
+4,16.0,16.0,0.0,1.0,efficient
+5,6.0,6.0,0.0,1.0,efficient
+6,8.0,12.0,0.40546511,0.6666666666666666,inefficient

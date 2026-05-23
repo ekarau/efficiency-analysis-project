@@ -45,11 +45,36 @@ Efficiency_Analysis_Project/
 │   ├── data_loader.py               # CSV → numpy arrays
 │   └── efficiency_model.py          # LP formulation + result post-processing
 ├── scripts/
-│   └── generate_synthetic_data.py   # Reproducible synthetic-data generator
+│   ├── generate_synthetic_data.py   # Reproducible synthetic-data generator
+│   ├── visualize_results.py         # Frontier scatter + per-firm KPI bars
+│   └── draw_flowchart.py            # LP-pipeline flowchart (PNG)
 ├── data/
 │   ├── lecture_example.csv          # 6-firm validation set (see Validation)
 │   └── synthetic_dataset.csv        # 20-firm AI-generated dataset
+├── figures/                         # written by visualize_results.py / draw_flowchart.py
 └── output/                          # written by `python main.py --save`
+```
+
+## Pipeline flowchart
+
+Per the lecturer's request (14 May 2026: *"draw a flow chart, then write the
+code"*), the implementation pipeline is summarised below. A PNG version
+suitable for the submission is rendered to `figures/pipeline_flowchart.png`
+by `python scripts/draw_flowchart.py`.
+
+```mermaid
+flowchart TD
+    A([Start: J firms, M inputs, single output]) --> B[Load CSV → X J×M, Y J]
+    B --> C[Validate: X &gt; 0 and Y &gt; 0]
+    C --> D["Transform: ln(X), ln(Y)"]
+    D --> E["Build LP<br/>min Σ D_j<br/>s.t. D_j = ln(K) + Σ α_i·ln(X_ij) − ln(Y_j)<br/>D_j ≥ 0, α_i ≥ 0, ln(K) free"]
+    E --> F[Solve LP with CBC via PuLP]
+    F --> G{Status == Optimal?}
+    G -- No --> H([Raise RuntimeError])
+    G -- Yes --> I["Recover K = exp(ln K), α, D"]
+    I --> J["Compute Y_optimal_j = K · Π X_ij^α_i<br/>KPI_j = Y_obs_j / Y_opt_j ∈ 0,1"]
+    J --> K[Classify firm j → efficient D≈0 or inefficient]
+    K --> L([End: parameters table, summary table, figures])
 ```
 
 ## Setup
@@ -61,7 +86,7 @@ pip install -r requirements.txt
 ```
 
 Dependencies: [PuLP](https://github.com/coin-or/pulp) (bundles the open-source
-CBC solver), NumPy, pandas.
+CBC solver), NumPy, pandas, matplotlib (for the figures and the flowchart).
 
 ## Usage
 
@@ -81,6 +106,19 @@ Regenerate the synthetic dataset from scratch (seed-controlled, reproducible):
 
 ```bash
 python scripts/generate_synthetic_data.py
+```
+
+Render figures (efficiency frontier + per-firm KPI bars) for a dataset:
+
+```bash
+python scripts/visualize_results.py --dataset data/lecture_example.csv
+python scripts/visualize_results.py --dataset data/synthetic_dataset.csv
+```
+
+Render the pipeline flowchart:
+
+```bash
+python scripts/draw_flowchart.py
 ```
 
 ### Expected CSV schema
@@ -147,12 +185,39 @@ AI-assisted artefacts:
 The mathematical model, the LP formulation, the choice of parameters, and
 the validation against the lecture example are the author's own work.
 
+## Visualization
+
+`scripts/visualize_results.py` fits the LP and renders two PNGs under
+`figures/` for a given dataset:
+
+- **`<dataset>_frontier.png`** — Y_observed vs. Y_optimal scatter with the
+  45° efficient-frontier reference line. Points on the line are efficient
+  (blue); points below are inefficient (orange).
+- **`<dataset>_kpi_bars.png`** — Per-firm KPI bar chart with the
+  `KPI = 1` threshold drawn for reference.
+
+For the bundled datasets, the script produces:
+
+| dataset                       | frontier                                      | KPI bars                                       |
+|-------------------------------|-----------------------------------------------|------------------------------------------------|
+| `data/lecture_example.csv`    | `figures/lecture_example_frontier.png`        | `figures/lecture_example_kpi_bars.png`         |
+| `data/synthetic_dataset.csv`  | `figures/synthetic_dataset_frontier.png`      | `figures/synthetic_dataset_kpi_bars.png`       |
+
+The lecture-example frontier visually confirms that firms 1, 2, 4, 5 sit on
+the 45° line while firms 3 and 6 fall below — matching the manual solution
+from the 7 May 2026 lecture (`K = 1`, `α = (0.5, 1)`).
+
 ## Submission workflow
 
-1. Verify the model on `data/lecture_example.csv` (above).
+1. Verify the model on `data/lecture_example.csv` (above) and save the
+   validation outputs: `python main.py --save`.
 2. Run the analysis on the synthetic dataset:
    `python main.py --dataset data/synthetic_dataset.csv --save`.
-3. Submit:
-   - the code repository (this folder), and
-   - the contents of `output/` produced in step 2.
-4. Optional follow-up: email the instructor for the real dataset and rerun.
+3. Render the figures and flowchart:
+   `python scripts/visualize_results.py --dataset data/lecture_example.csv && python scripts/visualize_results.py --dataset data/synthetic_dataset.csv && python scripts/draw_flowchart.py`.
+4. Submit (email Prof. Amirteimoori per his 7 May / 14 May instructions):
+   - the code repository (this folder),
+   - the contents of `output/` (parameter + summary CSVs for both datasets),
+   - the contents of `figures/` (frontier + KPI bars + pipeline flowchart).
+5. Optional follow-up: ask the instructor for the real dataset and rerun
+   steps 2–3 with `--dataset data/instructor_dataset.csv`.
