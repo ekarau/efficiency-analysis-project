@@ -198,14 +198,73 @@ the validation against the lecture example are the author's own work.
 
 For the bundled datasets, the script produces:
 
-| dataset                       | frontier                                      | KPI bars                                       |
-|-------------------------------|-----------------------------------------------|------------------------------------------------|
-| `data/lecture_example.csv`    | `figures/lecture_example_frontier.png`        | `figures/lecture_example_kpi_bars.png`         |
-| `data/synthetic_dataset.csv`  | `figures/synthetic_dataset_frontier.png`      | `figures/synthetic_dataset_kpi_bars.png`       |
+### Lecture example (6 firms) — validation
 
-The lecture-example frontier visually confirms that firms 1, 2, 4, 5 sit on
-the 45° line while firms 3 and 6 fall below — matching the manual solution
-from the 7 May 2026 lecture (`K = 1`, `α = (0.5, 1)`).
+| Frontier | Per-firm KPI |
+|---|---|
+| ![Lecture frontier](figures/lecture_example_frontier.png) | ![Lecture KPI](figures/lecture_example_kpi_bars.png) |
+
+The frontier visually confirms that firms 1, 2, 4, 5 sit on the 45° line
+while firms 3 and 6 fall below — matching the manual solution from the
+7 May 2026 lecture (`K = 1`, `α = (0.5, 1)`).
+
+### Synthetic dataset (20 firms) — analysis
+
+| Frontier | Per-firm KPI |
+|---|---|
+| ![Synthetic frontier](figures/synthetic_dataset_frontier.png) | ![Synthetic KPI](figures/synthetic_dataset_kpi_bars.png) |
+
+## Results — synthetic dataset
+
+Estimated production function: `Y_optimal = 2.000 · X1^0.400 · X2^0.600`
+(matches the ground-truth parameters used by the generator).
+
+| firm_id | Y_observed | Y_optimal | deviation_D | KPI    | status      |
+|---------|-----------:|----------:|------------:|-------:|-------------|
+| firm_01 | 51.6313    | 59.8769   | 0.1482      | 0.8623 | inefficient |
+| firm_02 | 78.2531    | 78.2531   | 0.0000      | 1.0000 | efficient   |
+| firm_03 | 50.2209    | 50.2209   | 0.0000      | 1.0000 | efficient   |
+| firm_04 | 48.3744    | 79.8364   | 0.5010      | 0.6059 | inefficient |
+| firm_05 | 35.9318    | 35.9319   | 0.0000      | 1.0000 | efficient   |
+| firm_06 | 56.1743    | 68.7265   | 0.2017      | 0.8174 | inefficient |
+| firm_07 | 77.1866    | 77.1866   | 0.0000      | 1.0000 | efficient   |
+| firm_08 | 37.1089    | 37.1090   | 0.0000      | 1.0000 | efficient   |
+| firm_09 | 26.8678    | 26.8678   | 0.0000      | 1.0000 | efficient   |
+| firm_10 | 59.0090    | 73.4046   | 0.2183      | 0.8039 | inefficient |
+| firm_11 | 41.4909    | 53.7843   | 0.2595      | 0.7714 | inefficient |
+| firm_12 | 72.0375    | 93.1098   | 0.2566      | 0.7737 | inefficient |
+| firm_13 | 28.3304    | 42.1848   | 0.3981      | 0.6716 | inefficient |
+| firm_14 | 23.6026    | 23.6026   | 0.0000      | 1.0000 | efficient   |
+| firm_15 | 46.1025    | 46.1025   | 0.0000      | 1.0000 | efficient   |
+| firm_16 | 88.4951    | 88.4951   | 0.0000      | 1.0000 | efficient   |
+| firm_17 | 29.7385    | 41.6849   | 0.3378      | 0.7134 | inefficient |
+| firm_18 | 31.3847    | 35.2099   | 0.1150      | 0.8914 | inefficient |
+| firm_19 | 37.0052    | 37.0053   | 0.0000      | 1.0000 | efficient   |
+| firm_20 | 28.8244    | 50.2763   | 0.5563      | 0.5733 | inefficient |
+
+**Summary:** 10 / 20 firms are efficient (KPI = 1.0000). The 10 inefficient
+firms show KPIs ranging from 0.5733 (firm_20) to 0.8914 (firm_18); their
+deviation `D_j` is strictly positive, quantifying how far below the
+estimated Cobb–Douglas frontier each one operates.
+
+## References
+
+1. Charnes, A., Cooper, W. W., & Rhodes, E. (1978). *Measuring the
+   efficiency of decision making units.* European Journal of Operational
+   Research, 2(6), 429–444. (Foundational DEA paper.)
+2. Cobb, C. W., & Douglas, P. H. (1928). *A Theory of Production.*
+   American Economic Review, 18(1, Supplement), 139–165.
+   (Original Cobb–Douglas production function.)
+3. Farrell, M. J. (1957). *The Measurement of Productive Efficiency.*
+   Journal of the Royal Statistical Society. Series A (General), 120(3),
+   253–290. (Efficiency-frontier framework that DEA generalises.)
+4. Banker, R. D., Charnes, A., & Cooper, W. W. (1984). *Some models for
+   estimating technical and scale inefficiencies in data envelopment
+   analysis.* Management Science, 30(9), 1078–1092.
+   (Variable-returns-to-scale extension; useful context for future work.)
+5. Amirteimoori, A. (2026). *Introduction to Optimization* — lecture
+   notes and slides, İstinye University, Spring 2026 semester.
+   (Course material; in particular *Int. Opt. Efficiency analysis.pdf*.)
 
 ## Submission workflow
 
